@@ -1,4 +1,4 @@
-use doti::tui::App;
+use doti::fe::App;
 use iocraft::prelude::*;
 
 fn main() {
