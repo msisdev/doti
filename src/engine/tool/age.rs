@@ -2,15 +2,21 @@ use ::age::secrecy::SecretString;
 use std::error::Error;
 use std::io::{Read, Write};
 
-use crate::engine::tool::CryptoTool;
+use crate::engine::tool::{CryptoTool, ToolKind};
 
 const AGE_ARMOR_HEADER: &[u8] = b"-----BEGIN AGE ENCRYPTED FILE-----";
 
+#[derive(Default)]
 pub struct AgeTool;
 
+#[derive(Default)]
 pub struct AgeArmoredTool;
 
 impl CryptoTool for AgeTool {
+    fn kind(&self) -> ToolKind {
+        ToolKind::Age
+    }
+
     fn encrypt(&self, data: &[u8], passphrase: SecretString) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut encrypted = vec![];
         let encryptor = ::age::Encryptor::with_user_passphrase(passphrase);
@@ -54,6 +60,10 @@ impl CryptoTool for AgeTool {
 }
 
 impl CryptoTool for AgeArmoredTool {
+    fn kind(&self) -> ToolKind {
+        ToolKind::AgeArmored
+    }
+
     fn encrypt(&self, data: &[u8], passphrase: SecretString) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut encrypted = vec![];
         let encryptor = ::age::Encryptor::with_user_passphrase(passphrase);

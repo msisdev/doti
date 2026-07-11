@@ -1,7 +1,5 @@
 use std::path::{Path, PathBuf};
 
-use crate::engine::state::{FileState, has_secret_extension, to_plain_path, to_secret_path};
-
 /// A path object that serves as an IO target.
 pub struct DotiPath {
     pub path: PathBuf,
