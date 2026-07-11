@@ -1,4 +1,35 @@
 use std::path::{Path, PathBuf};
+use crate::engine::enc::FileState;
+
+const SECRET_EXT: &str = "age";
+
+fn has_secret_extension(path: &Path) -> bool {
+    path.extension().and_then(|s| s.to_str()) == Some(SECRET_EXT)
+}
+
+fn to_plain_path(path: &Path) -> PathBuf {
+    if has_secret_extension(path) {
+        path.with_extension("")
+    } else {
+        path.to_path_buf()
+    }
+}
+
+fn to_secret_path(path: &Path) -> PathBuf {
+    if has_secret_extension(path) {
+        path.to_path_buf()
+    } else {
+        match path.extension() {
+            Some(ext) => {
+                let mut new_ext = ext.to_os_string();
+                new_ext.push(".");
+                new_ext.push(SECRET_EXT);
+                path.with_extension(new_ext)
+            }
+            None => path.with_extension(SECRET_EXT),
+        }
+    }
+}
 
 /// A path object that serves as an IO target.
 pub struct DotiPath {
