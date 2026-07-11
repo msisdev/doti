@@ -16,5 +16,5 @@ pub trait CryptoTool {
 
     fn decrypt(&self, encrypted: &[u8], passphrase: SecretString) -> Result<Vec<u8>, Box<dyn Error>>;
 
-    fn is_my_file(&self, encrypted: &[u8]) -> bool;
+    fn is_my_fmt(&self, encrypted: &[u8]) -> bool;
 }

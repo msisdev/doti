@@ -44,9 +44,9 @@ impl CryptoTool for AgeTool {
         }
     }
 
-    fn is_my_file(&self, encrypted: &[u8]) -> bool {
+    fn is_my_fmt(&self, encrypted: &[u8]) -> bool {
         if encrypted.starts_with(AGE_ARMOR_HEADER) {
-            return true;
+            return false;
         }
 
         ::age::Decryptor::new(encrypted).is_ok()
@@ -81,7 +81,60 @@ impl CryptoTool for AgeArmoredTool {
         Ok(decrypted)
     }
 
-    fn is_my_file(&self, encrypted: &[u8]) -> bool {
+    fn is_my_fmt(&self, encrypted: &[u8]) -> bool {
         encrypted.starts_with(AGE_ARMOR_HEADER)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{AgeArmoredTool, AgeTool};
+    use ::age::secrecy::SecretString;
+    use crate::engine::tool::CryptoTool;
+
+    fn sample_payloads() -> (Vec<u8>, Vec<u8>) {
+        let age_tool = AgeTool;
+        let armored_tool = AgeArmoredTool;
+
+        let binary_age = age_tool
+            .encrypt(b"hello", SecretString::new("pw".into()))
+            .expect("failed to produce binary age payload");
+        let armored_age = armored_tool
+            .encrypt(b"hello", SecretString::new("pw".into()))
+            .expect("failed to produce armored age payload");
+
+        (binary_age, armored_age)
+    }
+
+    #[test]
+    fn age_tool_accepts_binary_age_file() {
+        let age_tool = AgeTool;
+        let (binary_age, _) = sample_payloads();
+
+        assert!(age_tool.is_my_fmt(&binary_age));
+    }
+
+    #[test]
+    fn age_tool_rejects_armored_age_file() {
+        let age_tool = AgeTool;
+        let (_, armored_age) = sample_payloads();
+
+        assert!(!age_tool.is_my_fmt(&armored_age));
+    }
+
+    #[test]
+    fn armored_tool_accepts_armored_age_file() {
+        let armored_tool = AgeArmoredTool;
+        let (_, armored_age) = sample_payloads();
+
+        assert!(armored_tool.is_my_fmt(&armored_age));
+    }
+
+    #[test]
+    fn armored_tool_rejects_binary_age_file() {
+        let armored_tool = AgeArmoredTool;
+        let (binary_age, _) = sample_payloads();
+
+        assert!(!armored_tool.is_my_fmt(&binary_age));
     }
 }

@@ -14,7 +14,7 @@ impl CryptoTool for PlaintextTool {
         Ok(encrypted.to_vec())
     }
 
-    fn is_my_file(&self, _encrypted: &[u8]) -> bool {
+    fn is_my_fmt(&self, _encrypted: &[u8]) -> bool {
         true
     }
 }
